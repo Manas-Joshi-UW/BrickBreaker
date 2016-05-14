@@ -1,0 +1,139 @@
+<html>
+<canvas id="gameCanvas" width="1000"  height="600"></canvas>
+<script>
+var r='red';
+var b='blue';
+var g='green';
+var ballspeedX=4;
+var ballspeedY=5;
+var count=0,count2=-1;
+var ballX=300;
+var ballY=400;
+var start=0;
+var color;
+var paddle1x=350;
+var paddle1y=532;
+var x_brick = 50;
+var y_brick = 100;
+var dx;
+var colarray = [];
+for(i=0;i<=24;i++){ // gives the color of the bricks
+    color=Math.floor((Math.random() * 3) + 1);
+    colarray.push(color);
+}
+window.onload = function () {
+canvas=document.getElementById('gameCanvas');
+canvascontext=canvas.getContext('2d');
+canvas.setAttribute("tabindex", 0);
+setInterval(function (){
+    moveShapes();
+    drawShapes();
+    moveBall();
+},1000/30);
+canvas.addEventListener('keydown',movePaddle);
+}
+function movePaddle(evt){
+    if(evt.keyCode=='39'&&paddle1x<=canvas.width-100){
+        paddle1x+=15;
+    }
+    else if(evt.keyCode=='37'&&paddle1x>=0){
+        paddle1x-=15;
+    }
+}
+
+function moveBall(){
+    ballX+=ballspeedX;
+    ballY+=ballspeedY;
+}
+    function moveShapes(){
+        console.log(ballX);
+        console.log(ballY);
+        if(ballX>canvas.width-10){
+            ballspeedX=-ballspeedX;
+            start++;
+            setTimeout(moveShapes,30);
+        }
+        else if (ballX<10){
+            ballspeedX=-ballspeedX;
+            start++;
+            setTimeout(moveShapes,30);
+        }
+        else if(ballY<10){
+            ballspeedY=-ballspeedY;
+            start++;
+            setTimeout(moveShapes,30);
+        }
+        else if ((ballY>paddle1y-15)&&(ballY<paddle1y+15)&&(ballX>paddle1x-10&&ballX<paddle1x+110)){
+            var deltax = ballX-(paddle1x+50);
+            if(deltax<0 && ballspeedX < 0){
+                ballspeedX = -ballspeedX;
+            }
+            
+            ballspeedX += deltax*0.1;
+            deltax = Math.abs(deltax);
+            if(ballspeedY<8){
+            ballspeedY += deltax*0.05;
+            }
+            ballspeedY = -ballspeedY;
+            start++;
+            setTimeout(moveShapes,500);
+           // setTimeout(moveBall,300);
+        }
+        for(x=x_brick;x<canvas.width-50;x+=160){ // x coordinate of paddle
+            for(y=y_brick;y<240;y+=45){
+            count2++;
+            if((ballX>x-5 && ballX<x+105)&&(ballY>y-10 && ballY<y+25)&&colarray[count2]>0){
+                var deltax = ballX-(x+50);
+                if(deltax<0 && ballspeedX < 0){
+                ballspeedX = -ballspeedX;
+                }
+                if(ballspeedX < 13){
+                ballspeedX += deltax*0.1;
+                }
+                deltax = Math.abs(deltax);
+                colarray[count2]-=1;
+                ballspeedY=-ballspeedY;
+                start++;
+                setTimeout(moveShapes,1000);
+                //setTimeout(moveBall,200);
+            }
+          }
+        }
+        count2=0;
+}
+    function drawShapes(){
+    //console.log(ballY);
+    colorRect(0,0,canvas.width,canvas.height,'black');// draws black background
+    // all the blocks
+    for(i=x_brick;i<canvas.width-50;i+=160){ // x coordinate of brick
+        for(j=y_brick;j<240;j+=45){ // y coordinate of brick
+            count++;
+            if (colarray[count]==1){
+           colorRect(i,j,100,10,r);
+            }
+            else if(colarray[count]==2){
+            colorRect(i,j,100,10,b);
+            }
+            else if(colarray[count]==3) {
+            colorRect(i,j,100,10,g);
+            }
+            else{
+            colorRect(i,j,100,30,'black');
+            }
+        }
+    }
+    count=0;
+    // the paddle
+    colorRect(paddle1x,paddle1y,100,10,'white');
+    // the ball
+        canvascontext.fillStyle='white';
+        canvascontext.beginPath();
+        canvascontext.arc(ballX,ballY,10,0,Math.PI*2,true);
+        canvascontext.fill();
+    }
+function colorRect(leftX,topY,width,height,drawColor){
+canvascontext.fillStyle=drawColor;
+canvascontext.fillRect(leftX,topY,width,height);
+}
+</script>
+</html>
